@@ -50,6 +50,7 @@
         <input id="cor" name="cor" type="text"  placeholder="Insira o nome da cor"/>
         <br /> <br />
 
+        <input type="hidden" name="metodo" value="1">
         <button type="submit" onclick="return validaSubmitCor()" id="cadastrar" name="cadastrar" value="1">Cadastrar</button>
     <form>
 

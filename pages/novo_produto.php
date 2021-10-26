@@ -20,7 +20,7 @@
     <h1>Cadastro de Produto</h1>
 
     <form method="post" id="form_produto" name="form_produto" action="database/cadastrar_produto.php">
-
+        
         <label for="nome">Nome</label> <br />
         <input id="nome" name="nome" type="text"  placeholder="Nome do produto"  />
         <br /> <br />
@@ -49,6 +49,7 @@
         <input id="preco" name="preco" type="number" step=".01" placeholder="0,00"/>
         <br /> <br />
 
+        <input type="hidden" name="metodo" value="1">
         <button type="submit" onclick="return validaSubmitProduto()" id="cadastrar" name="cadastrar" value="1">Cadastrar</button>
     <form>
 
