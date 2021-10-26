@@ -84,6 +84,8 @@
         }
     ?>
 
+<br>
+    <a href="create.php"><button>Cadastrar Cor</button></a><br />
 </body>
 </html>
 
