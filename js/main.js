@@ -1,6 +1,6 @@
 
     // Enviar formularios via ajax
-function enviarForm(destino, form_id) {
+function enviarForm(destino, form_id, redirect = undefined) {
       var xhttp = new XMLHttpRequest();
       var url = destino;
         
@@ -8,17 +8,21 @@ function enviarForm(destino, form_id) {
       var formData = document.querySelector('#' + form_id);
       var data = new FormData(formData);
 
-      console.log(data);
       xhttp.overrideMimeType("application/json");  
       xhttp.open('POST', url, true);
 
       xhttp.onreadystatechange = function() {
+        // Caso a requisiçao volte sucesso
         if (this.readyState == 4 && this.status == 200) {
           var response = JSON.parse(xhttp.responseText);
 
           console.log(response);
             // Mostra um alerta com a resposta do servidor
           alert(`${response.mensagem}`);
+
+            if (redirect && response.success !== 0){
+                window.location.href = redirect;    
+            }
         }
       };
 
