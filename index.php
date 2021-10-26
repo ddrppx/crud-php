@@ -8,13 +8,16 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS Externo -->
     <link rel="stylesheet" href="css/main.css">
+    <!-- JS Externo -->
+    <script src="js/main.js"></script>
     <title>Pagina Principal</title>
 </head>
 <body>
     <h2>Produtos</h2>
     <?php
-        $sql = "SELECT p.nome, c.cor FROM produtos p JOIN cores c ON p.cor = c.idcor JOIN precos pc ON pc.idprod = p.idprod";
+        $sql = "SELECT p.idprod as id, p.nome, pc.preco, c.cor FROM produtos p JOIN cores c ON p.cor = c.idcor JOIN precos pc ON pc.idprod = p.idprod";
         $q = mysqli_query($connect, $sql);
 
         if (mysqli_num_rows($q) == 0){
@@ -27,19 +30,24 @@
                 <th>Nome do Produto</th>
                 <th>Cor</th>
                 <th>Preço</th>
+                <th colspan="2">Açoes</th>
             </tr>
         </thead>
 
         <tbody>
             <?php 
+                    $param = base64_encode('id');
                     while ($res = mysqli_fetch_array($q)){
-                        echo "<tr>";
-                        echo "<td>". $res['nome'] ."</td>";
-                        echo "<td>". $res['cor'] ."</td>";
-                        echo "<td>". $res['preco']."</td>";
-                        echo "<td><a href='update.php?id=". $data['id']."'>Editar</a>";
-                        echo "<td><a href='database/delete.php?id=". $data['id']. "'>Apagar</a>";
-                        echo "</tr>";
+                        $id_64 = base64_encode($res['id']);
+                        ?>
+                        <tr>
+                            <td><?= $res['nome'] ?></td>
+                            <td><?= $res['cor'] ?></td>
+                            <td>R$ <?= number_format($res['preco'], 2, ",", ".") ?></td>
+                            <td><a href='pages/edit_produto.php?i=<?= $id_64 ?>'>Editar</a>
+                            <td><a href="#" onclick="apagarProd('post/request_produto.php', <?= $res['id'] ?>, '<?= $res['nome'] ?>', 'index.php')">Apagar</a>
+                        </tr>
+                        <?php 
                     }
             ?>
         </tbody>
@@ -48,11 +56,11 @@
         }
     ?>
 <br>
-    <a href="create.php"><button>Cadastrar Produto</button></a><br />
+    <a href="pages/novo_produto.php"><button>Cadastrar Produto</button></a><br />
 <br>
  <h2>Cores</h2>
     <?php
-        $sql = "SELECT cor FROM cores";
+        $sql = "SELECT c.cor, count(p.cor) as qtd_prod FROM cores c LEFT JOIN produtos p ON p.cor = c.idcor  GROUP BY idcor";
         $q = mysqli_query($connect, $sql);
 
         if (mysqli_num_rows($q) == 0){
@@ -63,7 +71,8 @@
         <thead>
             <tr>
                 <th>Cor</th>
-                <th>Prod. Com cor</th>
+                <th>Quant. Produtos</th>
+                <th colspan="2">Açoes</th>
             </tr>
         </thead>
 
@@ -72,7 +81,7 @@
                     while ($res = mysqli_fetch_array($q)){
                         echo "<tr>";
                         echo "<td>". $res['cor'] ."</td>";
-                        echo "<td></td>";
+                        echo "<td>". $res['qtd_prod']."</td>";
                         echo "<td><a href='update.php?id=". $data['id']."'>Editar</a>";
                         echo "<td><a href='database/delete.php?id=". $data['id']. "'>Apagar</a>";
                         echo "</tr>";
@@ -85,7 +94,7 @@
     ?>
 
 <br>
-    <a href="create.php"><button>Cadastrar Cor</button></a><br />
+    <a href="pages/nova_cor.php"><button>Cadastrar Cor</button></a><br />
 </body>
 </html>
 
