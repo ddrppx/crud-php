@@ -44,13 +44,13 @@
     ?>
 
     <br>
-    <form method="post" id="form_produto" name="form_produto" action="database/cadastrar_produto.php">
+    <form method="post" id="form_cor" name="form_cor">
 
         <label for="cor">Cor</label> <br />
         <input id="cor" name="cor" type="text"  placeholder="Insira o nome da cor"/>
         <br /> <br />
 
-        <button type="submit" onclick="return validaSubmitProduto()" id="cadastrar" name="cadastrar" value="1">Cadastrar</button>
+        <button type="submit" onclick="return validaSubmitCor()" id="cadastrar" name="cadastrar" value="1">Cadastrar</button>
     <form>
 
     <!-- JS Externo -->
