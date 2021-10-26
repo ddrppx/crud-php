@@ -1,8 +1,21 @@
 <?php 
-include('db_config.php');
+# Incluindo as constantes de configuraçao do banco
+require('db_config.php');
 
-$connect = mysqli_connect($servername, $username, 
-            $password, $db_name);
+$servername = SERVER_NAME;
+$username = USER_NAME;
+$password = PASSWORD;
+$db_name = DB_NAME;
+
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+# Estabelecendo conexao com o banco
+$connect = mysqli_connect(
+    $servername, 
+    $username, 
+    $password, 
+    $db_name
+);
 
 mysqli_set_charset($connect, "utf8");
 
