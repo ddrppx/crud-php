@@ -3,6 +3,10 @@ CREATE TABLE IF NOT EXISTS cores(
     cor VARCHAR(20) NOT NULL
 );
 
+INSERT INTO cores(cor) VALUES('Amarelo');
+INSERT INTO cores(cor) VALUES('Azul');
+INSERT INTO cores(cor) VALUES('Vermelho');
+
 CREATE TABLE IF NOT EXISTS produtos(
     idprod INTEGER(8) PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(40) NOT NULL,
