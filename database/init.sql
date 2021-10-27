@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS precos(
     idpreco INTEGER(8) PRIMARY KEY AUTO_INCREMENT,
     idprod INTEGER(8) NOT NULL,
     preco DECIMAL(8,2) NOT NULL,
+    preco_descontado DECIMAL(8,2) NOT NULL,
     FOREIGN KEY(idprod) REFERENCES produtos (idprod)
 );
 
