@@ -24,13 +24,13 @@
             echo "A lista de produtos esta vazia<br>";
         } else {
     ?>
-    <table>
+    <table class="produtos">
         <thead>
             <tr>
                 <th>Nome do Produto</th>
                 <th>Cor</th>
                 <th>Preço</th>
-                <th colspan="2">Açoes</th>
+                <th colspan="2" class="centro">Açoes</th>
             </tr>
         </thead>
 
@@ -44,8 +44,8 @@
                             <td><?= $res['nome'] ?></td>
                             <td><?= $res['cor'] ?></td>
                             <td class="number">R$ <?= number_format($res['preco'], 2, ",", ".") ?></td>
-                            <td><a href='pages/edit_produto.php?i=<?= $id_64 ?>'>Editar</a>
-                            <td><a href="#" onclick="apagarProd('post/request_produto.php', <?= $res['id'] ?>, '<?= $res['nome'] ?>', 'index.php')">Apagar</a>
+                            <td class="centro"><a href='pages/edit_produto.php?i=<?= $id_64 ?>'>Editar</a>
+                            <td class="centro"><a href="#" onclick="apagarProd('post/request_produto.php', <?= $res['id'] ?>, '<?= $res['nome'] ?>', 'index.php')">Apagar</a>
                         </tr>
                         <?php 
                     }

@@ -1,7 +1,16 @@
+body{
+    width: 80%;
+    margin: auto;
+}
+
+.produtos {
+    width: 100%;
+}
 table, th, td {
     border: 1px solid black;
     border-collapse: collapse;
     padding: 5px;
+   
 }
 
 button {
@@ -10,4 +19,8 @@ button {
 
 .number {
     text-align: right;
+}
+
+.centro {
+    text-align: center;
 }
