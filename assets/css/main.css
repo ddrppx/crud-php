@@ -3,9 +3,6 @@ body{
     margin: auto;
 }
 
-.produtos {
-    width: 100%;
-}
 table, th, td {
     border: 1px solid black;
     border-collapse: collapse;
@@ -24,3 +21,12 @@ button {
 .centro {
     text-align: center;
 }
+
+fieldset {
+    width: max-content;
+}
+
+input[type="number"] {
+    width: 100px;
+}
+

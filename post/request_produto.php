@@ -5,6 +5,11 @@ require_once '../assets/functions.php';
     $metodo = $_POST['metodo'];
     $msg = "";
 
+    // Switch metodo
+    // 1 - Criar (Insert)
+    // 2 - Atualizar (Update)
+    // 3 - Exclusão (Delete)
+    // 4 - Busca/Filtragem (Select)
     switch($metodo){
         // Cadastrar novo produto
         case 1:
@@ -28,7 +33,8 @@ require_once '../assets/functions.php';
                 if($INSERT){
                     $id_produto = mysqli_insert_id($connect);
                   
-                    $insert_preco = "INSERT INTO precos (idprod, preco) VALUES($id_produto, $preco)";
+                    $preco_descontado = resolvePreco($cor, $preco);
+                    $insert_preco = "INSERT INTO precos (idprod, preco, preco_descontado) VALUES($id_produto, $preco, $preco_descontado)";
                     $INSERT_PRECO = mysqli_query($connect, $insert_preco);
 
                     $msg .= "Produto $nome cadastrado com sucesso!";
@@ -56,7 +62,7 @@ require_once '../assets/functions.php';
                 $success = 0;
             }
 
-            $sql = "SELECT p.idprod, p.nome, pr.preco FROM produtos p JOIN precos pr ON pr.idprod = p.idprod WHERE p.idprod='$id'";
+            $sql = "SELECT p.idprod, p.nome, pr.preco, p.cor FROM produtos p JOIN precos pr ON pr.idprod = p.idprod WHERE p.idprod='$id'";
 
             // Checa se existe o id e se passou pelos filtros
             if($id && $success) {
@@ -65,7 +71,7 @@ require_once '../assets/functions.php';
                 
                 $id_prod = $r['idprod'];
 
-                // Armazena os itens atualizados para mostrar na mensagem 
+                // Armazenar os itens atualizados para mostrar na mensagem 
                 $atualizados = [];
 
                 // Se o nome tiver mudado entra na condiçao
@@ -84,7 +90,8 @@ require_once '../assets/functions.php';
                 // Se o preço tiver mudado entra na condiçao
                 // e executa o update
                 if($r['preco'] != $preco){ 
-                    $sql = "UPDATE precos SET preco = '$preco' WHERE idprod = '$id'";
+                    $preco_descontado = resolvePreco($r['cor'], $preco);
+                    $sql = "UPDATE precos SET preco = '$preco', preco_descontado = '$preco_descontado' WHERE idprod = '$id'";
                     $update_preco = mysqli_query($connect, $sql);
                     if($update_preco){
                        $atualizados[] = "Preço";
@@ -138,7 +145,6 @@ require_once '../assets/functions.php';
             break;
             // Busca de produtos
         case 4:
-            $msg = print_r($_POST, true);
             $success = 0;
             $busca = addslashes($_POST['busca']);
             $cor = filter_var($_POST['cor'], FILTER_VALIDATE_INT) ? addslashes($_POST['cor']) : null;
@@ -164,9 +170,9 @@ require_once '../assets/functions.php';
                         $acao = " = ";
                         break;
                 }
-                $sql_preco = "AND pc.preco $acao $preco";
+                $sql_preco = "AND pc.preco_descontado $acao $preco";
         }
-        $sql = "SELECT p.idprod as id, p.nome, pc.preco, c.cor, c.idcor 
+        $sql = "SELECT p.idprod as id, p.nome, pc.preco_descontado, c.cor, c.idcor 
             FROM produtos p 
             JOIN cores c ON p.cor = c.idcor 
             JOIN precos pc ON pc.idprod = p.idprod
@@ -182,14 +188,11 @@ require_once '../assets/functions.php';
             $dados = [];
             while($r = mysqli_fetch_array($q)){
 
-                // Resolve o disconto dos produtos e suas respectivas cores
-                $preco = resolvePreco($r['idcor'], $r['preco']);
-
                 // Dados da tabela à enviar como resposta do ajax
                 $dados[] = [
                     'id' => $r['id'],
                         'nome' => $r['nome'],
-                        'preco' => $preco,
+                        'preco' => $r['preco_descontado'],
                         'cor' => $r['cor']
                     ];
                     $preco = "";

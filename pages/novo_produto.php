@@ -10,9 +10,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- CSS Externo -->
-    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
     <!-- JS Externo -->
-    <script src="../js/main.js"></script>
+    <script src="../assets/js/main.js"></script>
 
     <title>Novo Produto</title>
 </head>
@@ -54,7 +54,7 @@
     <form>
 
     <!-- JS Externo -->
-    <script src="../js/novo_produto.js"></script> 
+    <script src="../assets/js/novo_produto.js"></script> 
 
 </body>
 </html>
