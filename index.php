@@ -19,7 +19,7 @@
 <body>
     <h2>Produtos</h2>
     <?php
-        $sql = "SELECT p.idprod as id, p.nome, pc.preco, c.cor, c.idcor FROM produtos p JOIN cores c ON p.cor = c.idcor JOIN precos pc ON pc.idprod = p.idprod";
+        $sql = "SELECT p.idprod as id, p.nome, pc.preco_descontado, c.cor, c.idcor FROM produtos p JOIN cores c ON p.cor = c.idcor JOIN precos pc ON pc.idprod = p.idprod";
         $q = mysqli_query($connect, $sql);
 
         if (mysqli_num_rows($q) == 0){
@@ -69,12 +69,11 @@
                     $param = base64_encode('id');
                     while ($res = mysqli_fetch_array($q)){
                         $id_64 = base64_encode($res['id']);
-                        $preco = resolvePreco($res['idcor'], $res['preco']);
                         ?>
                         <tr>
                             <td><?= $res['nome'] ?></td>
                             <td><?= $res['cor'] ?></td>
-                            <td class="number">R$ <?= number_format($preco, 2, ",", ".") ?></td>
+                            <td class="number">R$ <?= number_format($res['preco_descontado'], 2, ",", ".") ?></td>
                             <td class="centro"><a href='pages/edit_produto.php?i=<?= $id_64 ?>'>Editar</a>
                             <td class="centro"><a href="#" onclick="apagarProd('post/request_produto.php', <?= $res['id'] ?>, '<?= $res['nome'] ?>', 'index.php')">Apagar</a>
                         </tr>
