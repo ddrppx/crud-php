@@ -30,6 +30,9 @@
                 }
                 break;
         }
+
+
+        // Faz os calculos corretos de desconto e retorna o valor
         $valor = ($preco - ($preco * $desconto));
         return $valor;
     }

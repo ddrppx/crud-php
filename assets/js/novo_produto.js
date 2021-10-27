@@ -3,6 +3,7 @@ var form_id = "form_produto";
 var destino = "../post/request_produto.php";
 var redirect = "../index.php";
 
+    // Faz a validação (Checa por campos vazios, etc)
 function validaSubmitProduto(){
     var form = document.getElementById(form_id);
    
@@ -14,6 +15,7 @@ function validaSubmitProduto(){
 
         // Loop em todos os elementos do formulario e checa se esta vazio
         if(form[i].value === ""){
+            console.log(form[i]);
             alert("Nao podem ser deixados campos vazios.");
             return false;
         }
@@ -26,7 +28,11 @@ function validaSubmitProduto(){
         return false;
     }
 
+    // Envia o formulario
     enviarForm(destino, form_id, redirect);
+
+    // Retorna false para o html não redirecionar a pagina
+    // Pois será redirecionado pelo callback
     return false;
 }
 

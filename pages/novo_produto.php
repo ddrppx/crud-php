@@ -28,6 +28,7 @@
         <label for="cor">Cor</label> <br />
         
         <?php 
+            // Trazendo todas as cores
             $sql = "SELECT idcor, cor FROM cores";
             $q = mysqli_query($connect, $sql);   
             if(mysqli_num_rows($q) > 0){

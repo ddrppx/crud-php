@@ -33,6 +33,7 @@ require_once '../assets/functions.php';
                 if($INSERT){
                     $id_produto = mysqli_insert_id($connect);
                   
+                    // Resolve o preço descontado para coloca-lo no banco
                     $preco_descontado = resolvePreco($cor, $preco);
                     $insert_preco = "INSERT INTO precos (idprod, preco, preco_descontado) VALUES($id_produto, $preco, $preco_descontado)";
                     $INSERT_PRECO = mysqli_query($connect, $insert_preco);
@@ -90,9 +91,13 @@ require_once '../assets/functions.php';
                 // Se o preço tiver mudado entra na condiçao
                 // e executa o update
                 if($r['preco'] != $preco){ 
+
+                    // Resolve o novo preco descontado e atualiza o banco
                     $preco_descontado = resolvePreco($r['cor'], $preco);
+
                     $sql = "UPDATE precos SET preco = '$preco', preco_descontado = '$preco_descontado' WHERE idprod = '$id'";
                     $update_preco = mysqli_query($connect, $sql);
+
                     if($update_preco){
                        $atualizados[] = "Preço";
                     } else {
@@ -100,6 +105,7 @@ require_once '../assets/functions.php';
                     }
                     
                 }
+
                 // Verifica se atualizou mais de um
                 // e põe um 'e' entre eles 
                 if (count($atualizados) > 1) {
@@ -124,6 +130,8 @@ require_once '../assets/functions.php';
                 $sql_preco = "DELETE FROM precos WHERE idprod = '$id'";
                 $DELETE_PC = mysqli_query($connect, $sql_preco);
 
+                // Checa se a deleção do preco for true
+                // A constraint FK nao deixa deletar se ainda tiver preco vinculado
                 if($DELETE_PC) {
                     $sql_prod = "DELETE FROM produtos WHERE idprod = '$id'";
                     $DELETE = mysqli_query($connect, $sql_prod);
@@ -159,6 +167,8 @@ require_once '../assets/functions.php';
                     2 - Menor que
                     3 - Igual
                 */
+
+                // Resolve qual operador irá usar de acordo com a escolha do usuário
                 switch($tipo){
                     case 1:
                         $acao = " >= ";
@@ -172,6 +182,7 @@ require_once '../assets/functions.php';
                 }
                 $sql_preco = "AND pc.preco_descontado $acao $preco";
         }
+
         $sql = "SELECT p.idprod as id, p.nome, pc.preco_descontado, c.cor, c.idcor 
             FROM produtos p 
             JOIN cores c ON p.cor = c.idcor 
@@ -185,6 +196,8 @@ require_once '../assets/functions.php';
         $q = mysqli_query($connect, $sql);
 
         if(mysqli_num_rows($q)){
+
+            // Para retornar todos os valores encontrados na query select
             $dados = [];
             while($r = mysqli_fetch_array($q)){
 
@@ -205,6 +218,7 @@ require_once '../assets/functions.php';
             break;
     }
 
+    // Envia de volta a resposta
     $output = ['success'=> $success, 'mensagem'=> $msg, 'dados' => $dados];
     echo json_encode($output);
 ?>

@@ -53,7 +53,7 @@
     </select>
     <input type="submit" value="Filtrar" onclick="buscar()">
 </fieldset>
-
+<br>
     <table class="produtos">
         <thead>
             <tr>

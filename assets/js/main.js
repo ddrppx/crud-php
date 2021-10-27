@@ -30,6 +30,7 @@ function enviarForm(destino, form_id, redirect = undefined) {
 }
 
     // Permite enviar dados com form feito por meio do FormData
+    // E especificar um callback para a response
 function enviarFormManual(destino, formData, callback){
     var xhttp = new XMLHttpRequest();
     var url = destino;
@@ -83,8 +84,11 @@ function apagarProd(destino, id, nome, redirect){
 
 }
 
+    // Envia os valores de filtragem
 function buscar(){
     var destino = "post/request_produto.php";
+
+        // Valores a serem enviados
     var busca = document.getElementById('busca');
     var cor = document.getElementById('cor');
     var preco = document.getElementById('preco');
@@ -92,17 +96,26 @@ function buscar(){
 
     // Formulario à ser enviado
     var data = new FormData();
+
+    // Metodo 4 retorna um SELECT com parametros especificados
     data.append('metodo', 4);
+
     data.append('busca', busca.value);
     data.append('cor', cor.value);
     data.append('preco', preco.value);
     data.append('tipo', tipo.value);
 
     function callback(response) {
+        // Se a busca for vazia/nula
+        // Nao faz nada, somente mostra o alerta
         if(response.dados === null){
             alert('Nenhum resultado para esta busca.');
         } else {
+            // Iteração da variavel html
+            // Para depois inseri-la por meio da função na tabela (HTML)
             var html = "";
+
+            // Loop pelos valores da resposta
             for(var i = 0; i < response.dados.length; i++){
                 var produto = response.dados[i];
                 html += formatarHTML(produto);
@@ -111,10 +124,12 @@ function buscar(){
         }
     }
 
+    // Envia o formulario
     enviarFormManual(destino, data, callback);
 }
 
-    // Formata de objeto para table row/table data, para inserir na tabela html 
+    // Formata de objeto para table row<tr>/table data<td>, para inserir na tabela html
+    // Mais especificamente dentro do elemento <tbody> 
 function formatarHTML(item){
 
     // Link para a pagina de edição de produto

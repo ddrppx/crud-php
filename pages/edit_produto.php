@@ -13,7 +13,8 @@
 
     if($q){
         $res = mysqli_fetch_array($q);
-        $id_64 = base64_encode($id);
+
+        $id_64 = $_GET['i'];
     } else {
          $alert = "<script>alert('Nao foi possivel encontrar o produto')</script>";
     }
@@ -62,6 +63,7 @@
             <input type="hidden" name="metodo" value="2">
             <input type="hidden" name="i" value="<?= $id_64 ?>">
             <button type="submit" onclick="return validaSubmitProduto()" id="cadastrar" name="cadastrar" value="1">Atualizar</button>
+            <a href="../index.php" ><button type="button" name="button" value="0">Voltar</button></a>
 
         </form>
     </fieldset>
