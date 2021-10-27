@@ -28,11 +28,30 @@
 
 <fieldset>
     <legend>Filtros</legend>
-    <input type="text" id="busca" name="busca" placeholder="Buscar produtos">
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email">
+    <input type="text" id="busca" name="busca" placeholder="Buscar Por Nome">
+    <select id="cor" name="cor">
+        <option value="0" selected>Cores</option>
+    <?php 
+        $sql = "SELECT c.idcor, c.cor FROM cores c"; 
+        $q_cores = mysqli_query($connect, $sql);
+        while($r = mysqli_fetch_array($q_cores)){
+            ?>  
+                <option value="<?= $r['idcor'] ?>"><?= $r['cor'] ?></option>
+            <?php
+        }
+    ?>
+    <select>
+    <br><br>
+    Preço  
+    R$<input id="preco" name="preco" type="number" step=".01" placeholder="0,00" />
+    Tipo 
+    <select id="tipo" name="tipo">
+        <option value="1">Maior que</option>    
+        <option value="2">Menor que</option>    
+        <option value="3">Igual</option>    
+    </select>
     <input type="submit" value="Filtrar" onclick="buscar()">
-  </fieldset>
+</fieldset>
 
     <table class="produtos">
         <thead>

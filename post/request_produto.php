@@ -1,5 +1,7 @@
 <?php 
-require('../database/connect.php');
+require_once '../database/connect.php';
+require_once '../assets/functions.php';
+
     $metodo = $_POST['metodo'];
     $msg = "";
 
@@ -28,11 +30,15 @@ require('../database/connect.php');
                   
                     $insert_preco = "INSERT INTO precos (idprod, preco) VALUES($id_produto, $preco)";
                     $INSERT_PRECO = mysqli_query($connect, $insert_preco);
+
+                    $msg .= "Produto $nome cadastrado com sucesso!";
                     $success = 1;
                 }
+            } else {
+                $msg = "Você tem dados sobrando para completar o cadastro.";
+                $success = 0;
             } 
 
-            $msg .= "Produto $nome cadastrado com sucesso!";
 
             break;
             // Update do produto
@@ -100,7 +106,7 @@ require('../database/connect.php');
             break;
             // Exclusão de produtos
         case 3:
-            // Decodifica o id
+            // id
             $id_POST = $_POST['id'];
 
             // Verifica o id enviado pela requisição
@@ -130,13 +136,72 @@ require('../database/connect.php');
 
                 
             break;
+            // Busca de produtos
+        case 4:
+            $msg = print_r($_POST, true);
+            $success = 0;
+            $busca = addslashes($_POST['busca']);
+            $cor = filter_var($_POST['cor'], FILTER_VALIDATE_INT) ? addslashes($_POST['cor']) : null;
+            $tipo = filter_var($_POST['tipo'], FILTER_VALIDATE_INT) ? addslashes($_POST['tipo']) : null;
+            $preco = filter_var($_POST['preco'], FILTER_VALIDATE_FLOAT) ? addslashes($_POST['preco']) : null;
+            if(!empty($cor)){
+                $sql_cor = "AND c.idcor = '$cor'";
+            }
+            if(!empty($preco)){
+                /*
+                    1 - Maior que
+                    2 - Menor que
+                    3 - Igual
+                */
+                switch($tipo){
+                    case 1:
+                        $acao = " >= ";
+                        break;
+                    case 2:
+                        $acao = " <= ";
+                        break;
+                    case 3:
+                        $acao = " = ";
+                        break;
+                }
+                $sql_preco = "AND pc.preco $acao $preco";
+        }
+        $sql = "SELECT p.idprod as id, p.nome, pc.preco, c.cor, c.idcor 
+            FROM produtos p 
+            JOIN cores c ON p.cor = c.idcor 
+            JOIN precos pc ON pc.idprod = p.idprod
+            WHERE nome LIKE '%$busca%'
+            $sql_cor
+            $sql_preco
+            ";
+        
+        $msg = $sql;
+        $q = mysqli_query($connect, $sql);
 
+        if(mysqli_num_rows($q)){
+            $dados = [];
+            while($r = mysqli_fetch_array($q)){
+
+                // Resolve o disconto dos produtos e suas respectivas cores
+                $preco = resolvePreco($r['idcor'], $r['preco']);
+
+                // Dados da tabela à enviar como resposta do ajax
+                $dados[] = [
+                    'id' => $r['id'],
+                        'nome' => $r['nome'],
+                        'preco' => $preco,
+                        'cor' => $r['cor']
+                    ];
+                    $preco = "";
+                }
+            }
+            break;
         default:
             $msg = "Houve um erro ao encontrar o metodo";
             $success = 0;
             break;
     }
 
-    $output = ['success'=> $success, 'mensagem'=> $msg];
+    $output = ['success'=> $success, 'mensagem'=> $msg, 'dados' => $dados];
     echo json_encode($output);
 ?>
