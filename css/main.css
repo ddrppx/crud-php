@@ -7,3 +7,7 @@ table, th, td {
 button {
     font-size: 1rem;
 }
+
+.number {
+    text-align: right;
+}

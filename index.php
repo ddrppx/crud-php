@@ -43,7 +43,7 @@
                         <tr>
                             <td><?= $res['nome'] ?></td>
                             <td><?= $res['cor'] ?></td>
-                            <td>R$ <?= number_format($res['preco'], 2, ",", ".") ?></td>
+                            <td class="number">R$ <?= number_format($res['preco'], 2, ",", ".") ?></td>
                             <td><a href='pages/edit_produto.php?i=<?= $id_64 ?>'>Editar</a>
                             <td><a href="#" onclick="apagarProd('post/request_produto.php', <?= $res['id'] ?>, '<?= $res['nome'] ?>', 'index.php')">Apagar</a>
                         </tr>
@@ -72,19 +72,18 @@
             <tr>
                 <th>Cor</th>
                 <th>Quant. Produtos</th>
-                <th colspan="2">Açoes</th>
             </tr>
         </thead>
 
         <tbody>
             <?php 
                     while ($res = mysqli_fetch_array($q)){
-                        echo "<tr>";
-                        echo "<td>". $res['cor'] ."</td>";
-                        echo "<td>". $res['qtd_prod']."</td>";
-                        echo "<td><a href='update.php?id=". $data['id']."'>Editar</a>";
-                        echo "<td><a href='database/delete.php?id=". $data['id']. "'>Apagar</a>";
-                        echo "</tr>";
+                    ?>
+                        <tr>
+                            <td><?= $res['cor'] ?></td>
+                            <td class="number"><?= $res['qtd_prod'] ?></td>
+                        </tr>
+                    <?php
                     }
             ?>
         </tbody>
@@ -93,8 +92,10 @@
         }
     ?>
 
-<br>
+    <!-- 
+    <br>
     <a href="pages/nova_cor.php"><button>Cadastrar Cor</button></a><br />
+    -->
 </body>
 </html>
 
