@@ -10,9 +10,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- CSS Externo -->
-    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
     <!-- JS Externo -->
-    <script src="../js/main.js"></script>
+    <script src="../assets/js/main.js"></script>
 
     <title>Nova Cor</title>
 </head>
@@ -55,7 +55,7 @@
     <form>
 
     <!-- JS Externo -->
-    <script src="../js/nova_cor.js"></script> 
+    <script src="../assets/js/nova_cor.js"></script> 
 
 </body>
 </html>
