@@ -1,5 +1,4 @@
 # crud-php
-Tests
 
 Executar a queries em init.sql (database/init.sql)
 
