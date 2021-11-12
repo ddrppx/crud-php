@@ -7,16 +7,28 @@
     // Adiciona escapes caso seja inserido um texto
     $id = addslashes($id);
 
-    $sql = "SELECT p.nome, p.cor, pr.preco FROM produtos p JOIN precos pr ON pr.idprod = p.idprod WHERE p.idprod='$id'";
+    $sql = "SELECT p.nome, p.cor, pr.preco FROM produtos p JOIN precos pr ON pr.idprod = p.idprod WHERE p.idprod= :id";
 
-    $q = mysqli_query($connect, $sql);
+    # Fazendo o prepare statement
+    $stmt = $connect->prepare($sql);
 
-    if($q){
-        $res = mysqli_fetch_array($q);
+    # Insere o ID no statement
+    $stmt->execute(array(
+        'id' => $id
+    ));
+
+    if($stmt){
+        $res = $stmt->fetch();
 
         $id_64 = $_GET['i'];
     } else {
-         $alert = "<script>alert('Nao foi possivel encontrar o produto')</script>";
+        # Caso não seja encontrado o produto
+        # Mostra o alerta e volta para a principal
+        $alert = 
+            "<script>
+                alert('Nao foi possivel encontrar o produto.')
+                document.location.assign('../index.php');
+            </script>";
     }
 
 ?>
@@ -49,9 +61,13 @@
             
             <?php 
                 $cor = $res['cor'];
-                $sql = "SELECT idcor, cor FROM cores WHERE idcor = '$cor'";
-                $q = mysqli_query($connect, $sql);   
-                $r = mysqli_fetch_array($q);
+                $sql = "SELECT idcor, cor FROM cores WHERE idcor = :cor";
+                
+                $stmt_cor = $connect->prepare($sql);
+                $stmt_cor->execute(array(
+                    'cor' => $cor
+                ));
+                $r = $stmt_cor->fetch();
             ?>
             <input type="text" disabled value="<?= $r['cor'] ?>"></input>
             <br /> <br />

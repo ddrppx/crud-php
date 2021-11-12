@@ -30,13 +30,13 @@
         <?php 
             // Trazendo todas as cores
             $sql = "SELECT idcor, cor FROM cores";
-            $q = mysqli_query($connect, $sql);   
-            if(mysqli_num_rows($q) > 0){
+            $q = $connect->query($sql);  
+            if(count($q->fetchColumn()) > 0){
         ?>
             <select id="cor" name="cor"> 
                 <option selected disabled>Selecione...</option>
         <?php
-                while($r = mysqli_fetch_array($q)){
+                while($r = $q->fetch()){
                     ?>
                     <option value="<?= $r['idcor'] ?>"><?= $r['cor'] ?></option>
                     <?php 
