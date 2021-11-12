@@ -7,20 +7,14 @@ $username = USER_NAME;
 $password = PASSWORD;
 $db_name = DB_NAME;
 
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
 # Estabelecendo conexao com o banco
-$connect = mysqli_connect(
-    $servername, 
-    $username, 
-    $password, 
-    $db_name
-);
-
-mysqli_set_charset($connect, "utf8");
-
-if (mysqli_connect_error()) {
-    echo "Erro na conexão: ". mysqli_connect_error();
+# PDO connection
+try{ 
+    $connect = new PDO("mysql:host=$servername;dbname=$db_name", $username, $password);
+    $connect->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e){
+    ECHO "ERROR: ". $e->getMessage();
 }
+
 
 ?>
