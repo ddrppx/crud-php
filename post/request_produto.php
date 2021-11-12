@@ -25,23 +25,40 @@ require_once '../assets/functions.php';
                 $preco = str_replace(',', '.',$_POST['preco']);
             }
 
+            try {
             // Checa por variaveis vazias
-            if(!empty($nome) && !empty($cor) && !empty($preco)){
-                $insert = "INSERT INTO produtos (nome, cor) VALUES ('$nome', '$cor')";
-                $INSERT = mysqli_query($connect, $insert);
+                if(!empty($nome) && !empty($cor) && !empty($preco)){
+                    $insert = "INSERT INTO produtos (nome, cor) VALUES (:nome, :cor)";
+                    # Insert statement
+                    $insert_stmt = $connect->prepare($insert);
 
-                if($INSERT){
-                    $id_produto = mysqli_insert_id($connect);
-                  
-                    // Resolve o preço descontado para coloca-lo no banco
+                    # Dados a serem inseridos
+                    $dados = [
+                        'nome' => $nome,
+                        'cor' => $cor
+                    ];
+
+                    # Inserindo dados e executando
+                    $insert_stmt->execute($dados);
+
+                    // Pega o id do produto inserido
+                    $id_produto = $connect->lastInsertId();
+                      
+                        // Resolve o preço descontado para coloca-lo no banco
                     $preco_descontado = resolvePreco($cor, $preco);
-                    $insert_preco = "INSERT INTO precos (idprod, preco, preco_descontado) VALUES($id_produto, $preco, $preco_descontado)";
-                    $INSERT_PRECO = mysqli_query($connect, $insert_preco);
-
+                    $insert_preco = "INSERT INTO precos (idprod, preco, preco_descontado) VALUES(:id_produto, :preco, :preco_descontado)";
+                    $preco_stmt = $connect->prepare($insert_preco);
+                    $dados = [
+                        'id_produto' => $id_produto,
+                        'preco' => $preco,
+                        'preco_descontado' => $preco_descontado
+                    ];
+                    $preco_stmt->execute($dados);
+                    
                     $msg .= "Produto $nome cadastrado com sucesso!";
                     $success = 1;
                 }
-            } else {
+            } catch (PDOException $e){
                 $msg = "Você tem dados sobrando para completar o cadastro.";
                 $success = 0;
             } 
@@ -63,12 +80,15 @@ require_once '../assets/functions.php';
                 $success = 0;
             }
 
-            $sql = "SELECT p.idprod, p.nome, pr.preco, p.cor FROM produtos p JOIN precos pr ON pr.idprod = p.idprod WHERE p.idprod='$id'";
-
+            $sql = "SELECT p.idprod, p.nome, pr.preco, p.cor FROM produtos p JOIN precos pr ON pr.idprod = p.idprod WHERE p.idprod= :id";
+           
             // Checa se existe o id e se passou pelos filtros
             if($id && $success) {
-                $q = mysqli_query($connect, $sql);
-                $r = mysqli_fetch_array($q);
+                $select_stmt = $connect->prepare($sql);
+                $select_stmt->execute(array(
+                    'id' => $id
+                ));
+                $r = $select_stmt->fetch();
                 
                 $id_prod = $r['idprod'];
 
@@ -78,14 +98,16 @@ require_once '../assets/functions.php';
                 // Se o nome tiver mudado entra na condiçao
                 // e executa o update
                 if($r['nome'] != $nome){
-                    $sql = "UPDATE produtos SET nome = '$nome' WHERE idprod = '$id'" ;
-                    $update = mysqli_query($connect, $sql);
-                    
-                    if($update){
-                        $atualizados[] = "Nome";
-                    } else {
-                        $success = 0;
-                    }
+                    $sql_update = "UPDATE produtos SET nome = :nome WHERE idprod = :id";
+
+                    $update_stmt = $connect->prepare($sql_update);
+                    $dados = [
+                        'nome' => $nome,
+                        'id' => $id_prod
+                    ];
+                    $update_stmt->execute($dados);
+
+                    $atualizados[] = "Nome";
                 }
 
                 // Se o preço tiver mudado entra na condiçao
@@ -95,15 +117,17 @@ require_once '../assets/functions.php';
                     // Resolve o novo preco descontado e atualiza o banco
                     $preco_descontado = resolvePreco($r['cor'], $preco);
 
-                    $sql = "UPDATE precos SET preco = '$preco', preco_descontado = '$preco_descontado' WHERE idprod = '$id'";
-                    $update_preco = mysqli_query($connect, $sql);
+                    $sql_update_preco = "UPDATE precos SET preco = :preco, preco_descontado = :preco_descontado WHERE idprod = :id";
+                    $update_preco_stmt = $connect->prepare($sql_update_preco);
 
-                    if($update_preco){
-                       $atualizados[] = "Preço";
-                    } else {
-                        $success = 0;
-                    }
+                    $dados = [
+                        'id' => $id_prod,
+                        'preco' => $preco,
+                        'preco_descontado' => $preco_descontado
+                    ];
                     
+                    $update_preco_stmt->execute($dados);
+                    $atualizados[] = "Preço";
                 }
 
                 // Verifica se atualizou mais de um
