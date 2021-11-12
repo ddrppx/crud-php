@@ -20,9 +20,8 @@
     <h2>Produtos</h2>
     <?php
         $sql = "SELECT p.idprod as id, p.nome, pc.preco_descontado, c.cor, c.idcor FROM produtos p JOIN cores c ON p.cor = c.idcor JOIN precos pc ON pc.idprod = p.idprod";
-        $q = mysqli_query($connect, $sql);
-
-        if (mysqli_num_rows($q) == 0){
+        $q_produtos = $connect->query($sql);
+        if (count($q_produtos->fetchColumn()) == 0){
             echo "A lista de produtos esta vazia<br>";
         } else {
     ?>
@@ -34,8 +33,8 @@
         <option value="0" selected>Cores</option>
     <?php 
         $sql = "SELECT c.idcor, c.cor FROM cores c"; 
-        $q_cores = mysqli_query($connect, $sql);
-        while($r = mysqli_fetch_array($q_cores)){
+        $q_cores = $connect->query($sql);
+        while($r = $q_cores->fetch()){
             ?>  
                 <option value="<?= $r['idcor'] ?>"><?= $r['cor'] ?></option>
             <?php
@@ -67,7 +66,7 @@
         <tbody id="conteudo">
             <?php 
                     $param = base64_encode('id');
-                    while ($res = mysqli_fetch_array($q)){
+                    while ($res = $q_produtos->fetch()){
                         $id_64 = base64_encode($res['id']);
                         ?>
                         <tr>
@@ -90,10 +89,9 @@
 <br>
  <h2>Cores</h2>
     <?php
-        $sql = "SELECT c.cor, count(p.cor) as qtd_prod FROM cores c LEFT JOIN produtos p ON p.cor = c.idcor  GROUP BY idcor";
-        $q = mysqli_query($connect, $sql);
-
-        if (mysqli_num_rows($q) == 0){
+        $sql = "SELECT c.cor, count(p.cor) as qtd_prod FROM cores c LEFT JOIN produtos p ON p.cor = c.idcor GROUP BY idcor";
+        $q_cores_produtos = $connect->query($sql);
+        if (count($q_cores_produtos->fetchColumn()) == 0){
             echo "A lista de cores esta vazia<br>";
         } else {
     ?>
@@ -107,7 +105,7 @@
 
         <tbody>
             <?php 
-                    while ($res = mysqli_fetch_array($q)){
+                    while ($res = $q_cores_produtos->fetch()){
                     ?>
                         <tr>
                             <td><?= $res['cor'] ?></td>
