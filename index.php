@@ -21,7 +21,7 @@
     <?php
         $sql = "SELECT p.idprod as id, p.nome, pc.preco_descontado, c.cor, c.idcor FROM produtos p JOIN cores c ON p.cor = c.idcor JOIN precos pc ON pc.idprod = p.idprod";
         $q_produtos = $connect->query($sql);
-        if (count($q_produtos->fetchColumn()) == 0){
+        if ($q_produtos->rowCount() == 0){
             echo "A lista de produtos esta vazia<br>";
         } else {
     ?>
