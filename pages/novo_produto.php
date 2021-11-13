@@ -31,7 +31,7 @@
             // Trazendo todas as cores
             $sql = "SELECT idcor, cor FROM cores";
             $q = $connect->query($sql);  
-            if(count($q->fetchColumn()) > 0){
+            if(count($q->rowCount()) > 0){
         ?>
             <select id="cor" name="cor"> 
                 <option selected disabled>Selecione...</option>
