@@ -25,6 +25,8 @@ require_once '../assets/functions.php';
                 $preco = str_replace(',', '.',$_POST['preco']);
             }
 
+                // Try catch para poder retornar uma falha (se houver alguma)
+                // O PDO para a execução do script ao encontrar erro
             try {
             // Checa por variaveis vazias
                 if(!empty($nome) && !empty($cor) && !empty($preco)){
@@ -88,59 +90,65 @@ require_once '../assets/functions.php';
                 $select_stmt->execute(array(
                     'id' => $id
                 ));
-                $r = $select_stmt->fetch();
-                
-                $id_prod = $r['idprod'];
 
-                // Armazenar os itens atualizados para mostrar na mensagem 
-                $atualizados = [];
-
-                // Se o nome tiver mudado entra na condiçao
-                // e executa o update
-                if($r['nome'] != $nome){
-                    $sql_update = "UPDATE produtos SET nome = :nome WHERE idprod = :id";
-
-                    $update_stmt = $connect->prepare($sql_update);
-                    $dados = [
-                        'nome' => $nome,
-                        'id' => $id_prod
-                    ];
-                    $update_stmt->execute($dados);
-
-                    $atualizados[] = "Nome";
-                }
-
-                // Se o preço tiver mudado entra na condiçao
-                // e executa o update
-                if($r['preco'] != $preco){ 
-
-                    // Resolve o novo preco descontado e atualiza o banco
-                    $preco_descontado = resolvePreco($r['cor'], $preco);
-
-                    $sql_update_preco = "UPDATE precos SET preco = :preco, preco_descontado = :preco_descontado WHERE idprod = :id";
-                    $update_preco_stmt = $connect->prepare($sql_update_preco);
-
-                    $dados = [
-                        'id' => $id_prod,
-                        'preco' => $preco,
-                        'preco_descontado' => $preco_descontado
-                    ];
+                if($select_stmt->rowCount() > 0) {
+                    $r = $select_stmt->fetch();
                     
-                    $update_preco_stmt->execute($dados);
-                    $atualizados[] = "Preço";
-                }
+                    $id_prod = $r['idprod'];
 
-                // Verifica se atualizou mais de um
-                // e põe um 'e' entre eles 
-                if (count($atualizados) > 1) {
-                    $att = implode(' e ', $atualizados);
-                } else {
-                    $att = $atualizados[0];
-                }
-                $msg .= "$att Atualizado(s).";
-            } 
+                    // Armazenar os itens atualizados para mostrar na mensagem 
+                    $atualizados = [];
 
-            break;
+                    // Se o nome tiver mudado entra na condiçao
+                    // e executa o update
+                    if($r['nome'] != $nome){
+                        $sql_update = "UPDATE produtos SET nome = :nome WHERE idprod = :id";
+
+                        $update_stmt = $connect->prepare($sql_update);
+                        $dados = [
+                            'nome' => $nome,
+                            'id' => $id_prod
+                        ];
+                        $update_stmt->execute($dados);
+
+                        $atualizados[] = "Nome";
+                    }
+
+                    // Se o preço tiver mudado entra na condiçao
+                    // e executa o update
+                    if($r['preco'] != $preco){ 
+
+                        // Resolve o novo preco descontado e atualiza o banco
+                        $preco_descontado = resolvePreco($r['cor'], $preco);
+
+                        $sql_update_preco = "UPDATE precos SET preco = :preco, preco_descontado = :preco_descontado WHERE idprod = :id";
+                        $update_preco_stmt = $connect->prepare($sql_update_preco);
+
+                        $dados = [
+                            'id' => $id_prod,
+                            'preco' => $preco,
+                            'preco_descontado' => $preco_descontado
+                        ];
+                        
+                        $update_preco_stmt->execute($dados);
+                        $atualizados[] = "Preço";
+                    }
+
+                    // Verifica se atualizou mais de um
+                    // e põe um 'e' entre eles 
+                    if (count($atualizados) > 1) {
+                        $att = implode(' e ', $atualizados);
+                    } else {
+                        $att = $atualizados[0];
+                    }
+                        $msg .= "$att Atualizado(s).";
+                    } 
+                    $success = 1;
+                } else  {
+                    $msg = "Não foi possível encontrar o produto...";
+                    $success = 0;            
+                }
+        break;
             // Exclusão de produtos
         case 3:
             // id
@@ -149,25 +157,26 @@ require_once '../assets/functions.php';
             // Verifica o id enviado pela requisição
             if (filter_var($id_POST, FILTER_VALIDATE_INT)){
                 $id = $id_POST; 
+    
+                    // Try catch para poder retornar uma falha (se houver alguma)
+                    // O PDO para a execução do script ao encontrar erro
+                try {  
+                    // A constraint FK nao deixa deletar se ainda tiver preco vinculado
+                $sql_preco = "DELETE FROM precos WHERE idprod = :id";
+                $del_preco_stmt = $connect->prepare($sql_preco);
+                $del_preco_stmt->execute(array(
+                    'id' => $id
+                ));
 
-                // Se validado o id, executa a exclusão
-                $sql_preco = "DELETE FROM precos WHERE idprod = '$id'";
-                $DELETE_PC = mysqli_query($connect, $sql_preco);
-
-                // Checa se a deleção do preco for true
-                // A constraint FK nao deixa deletar se ainda tiver preco vinculado
-                if($DELETE_PC) {
-                    $sql_prod = "DELETE FROM produtos WHERE idprod = '$id'";
-                    $DELETE = mysqli_query($connect, $sql_prod);
-
-                    if($DELETE){
-                        $msg = "deletado com sucesso.";
-                        $success = 1;
-                    } else {
-                        $msg = "Erro ao deletar...";
-                        $success = 0;
-                    }
-                } else {
+                $sql_prod = "DELETE FROM produtos WHERE idprod = :id";
+                $del_prod_stmt = $connect->prepare($sql_prod);
+                $del_prod_stmt->execute(array(
+                    'id' => $id
+                ));
+                    $msg = "deletado com sucesso.";
+                    $success = 1;
+                } catch (PDOException $e){
+                    $msg = "Erro ao deletar...";
                     $success = 0;
                 }
 
@@ -179,61 +188,65 @@ require_once '../assets/functions.php';
         case 4:
             $success = 0;
             $busca = addslashes($_POST['busca']);
-            $cor = filter_var($_POST['cor'], FILTER_VALIDATE_INT) ? addslashes($_POST['cor']) : null;
-            $tipo = filter_var($_POST['tipo'], FILTER_VALIDATE_INT) ? addslashes($_POST['tipo']) : null;
-            $preco = filter_var($_POST['preco'], FILTER_VALIDATE_FLOAT) ? addslashes($_POST['preco']) : null;
-            if(!empty($cor)){
-                $sql_cor = "AND c.idcor = '$cor'";
+
+            // Usando filter validate para validar os valores enviados pelo POST
+            $cor = filter_var($_POST['cor'], FILTER_VALIDATE_INT) ? addslashes($_POST['cor']) :0;
+            $tipo = filter_var($_POST['tipo'], FILTER_VALIDATE_INT) ? addslashes($_POST['tipo']) : 0;
+            $preco = filter_var($_POST['preco'], FILTER_VALIDATE_FLOAT) ? addslashes($_POST['preco']) : 0;
+
+            // Resolve qual operador irá usar de acordo com a escolha do usuário
+            //  1 - Maior que | 2 - Menor que | 3 - Igual
+            switch($tipo){
+                case 1:
+                    $acao = '>=';
+                    break;
+                case 2:
+                    $acao = '<=';
+                    break;
+                case 3:
+                    $acao = '=';
+                    break;
             }
-            if(!empty($preco)){
-                /*
-                    1 - Maior que
-                    2 - Menor que
-                    3 - Igual
-                */
 
-                // Resolve qual operador irá usar de acordo com a escolha do usuário
-                switch($tipo){
-                    case 1:
-                        $acao = " >= ";
-                        break;
-                    case 2:
-                        $acao = " <= ";
-                        break;
-                    case 3:
-                        $acao = " = ";
-                        break;
+            try {
+                $sql_busca = "SELECT p.idprod as id, p.nome, pc.preco_descontado, c.cor, c.idcor 
+                    FROM produtos p 
+                    JOIN cores c ON p.cor = c.idcor 
+                    JOIN precos pc ON pc.idprod = p.idprod
+                    WHERE nome LIKE :busca
+                    AND IF( :preco > 0, pc.preco_descontado $acao :preco, true)
+                    AND IF( :cor > 0, c.idcor = :cor, true)
+                    ";
+                
+                $busca_stmt = $connect->prepare($sql_busca);
+                $dados_busca = [
+                    'busca' => "%$busca%",
+                    'preco' => $preco,
+                    'cor' => $cor
+                ];
+                
+                $busca_stmt->execute($dados_busca);
+
+                if($busca_stmt->rowCount() > 0){
+
+                    // Para retornar todos os valores encontrados na query select
+                    $dados = [];
+                    while($r = $busca_stmt->fetch()){
+
+                        // Dados da tabela à enviar como resposta do ajax
+                        $dados[] = [
+                            'id' => $r['id'],
+                                'nome' => $r['nome'],
+                                'preco' => $r['preco_descontado'],
+                                'cor' => $r['cor']
+                            ];
+                            $preco = "";
+                        }
                 }
-                $sql_preco = "AND pc.preco_descontado $acao $preco";
-        }
-
-        $sql = "SELECT p.idprod as id, p.nome, pc.preco_descontado, c.cor, c.idcor 
-            FROM produtos p 
-            JOIN cores c ON p.cor = c.idcor 
-            JOIN precos pc ON pc.idprod = p.idprod
-            WHERE nome LIKE '%$busca%'
-            $sql_cor
-            $sql_preco
-            ";
-        
-        $msg = $sql;
-        $q = mysqli_query($connect, $sql);
-
-        if(mysqli_num_rows($q)){
-
-            // Para retornar todos os valores encontrados na query select
-            $dados = [];
-            while($r = mysqli_fetch_array($q)){
-
-                // Dados da tabela à enviar como resposta do ajax
-                $dados[] = [
-                    'id' => $r['id'],
-                        'nome' => $r['nome'],
-                        'preco' => $r['preco_descontado'],
-                        'cor' => $r['cor']
-                    ];
-                    $preco = "";
-                }
+                $success = 1;
+            } catch(PDOException $e){
+                $msg = "Houve eu erro ao executar a busca...\n". $e->getMessage();
+                $success = 0;
             }
             break;
         default:
@@ -243,6 +256,11 @@ require_once '../assets/functions.php';
     }
 
     // Envia de volta a resposta
-    $output = ['success'=> $success, 'mensagem'=> $msg, 'dados' => $dados];
+    $output = [
+        'success'=> $success, 
+        'mensagem'=> $msg, 
+        'dados' => $dados
+    ];
+
     echo json_encode($output);
 ?>
