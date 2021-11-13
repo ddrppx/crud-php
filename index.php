@@ -120,11 +120,6 @@
     <?php 
         }
     ?>
-
-    <!-- 
-    <br>
-    <a href="pages/nova_cor.php"><button>Cadastrar Cor</button></a><br />
-    -->
 </body>
 </html>
 
