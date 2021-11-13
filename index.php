@@ -89,9 +89,9 @@
 <br>
  <h2>Cores</h2>
     <?php
-        $sql = "SELECT c.cor, count(p.cor) as qtd_prod FROM cores c LEFT JOIN produtos p ON p.cor = c.idcor GROUP BY idcor";
-        $q_cores_produtos = $connect->query($sql);
-        if (count($q_cores_produtos->fetchColumn()) == 0){
+        $sql_cores_produtos = "SELECT c.cor, count(p.cor) as qtd_prod FROM cores c LEFT JOIN produtos p ON p.cor = c.idcor GROUP BY idcor";
+        $q_cores_produtos = $connect->query($sql_cores_produtos);
+        if ($q_cores_produtos->rowCount() <= 0){
             echo "A lista de cores esta vazia<br>";
         } else {
     ?>
@@ -105,6 +105,7 @@
 
         <tbody>
             <?php 
+                    $q_cores_produtos = $connect->query($sql_cores_produtos);
                     while ($res = $q_cores_produtos->fetch()){
                     ?>
                         <tr>
